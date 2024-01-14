@@ -8,10 +8,22 @@ router.get('/', (req, res, next) => {
     });
 });
 
-// INSERE UM USUARIO
-router.post('/', (req, res, next) => {
+// CADASTRA UM USUARIO
+router.post('/cadastro', (req, res, next) => {
+
+    const usuario = {
+        id_usuario: req.body.id_usuario,
+        primeiroNome_usuario: req.body.primeiroNome_usuario,
+        ultimoNome_usuario: req.body.ultimoNome_usuario,
+        email_usuario: req.body.email_usuario,
+        senha_usuario: req.body.senha_usuario,
+        status_usuario: req.body.status_usuario,
+        dataNascimento_usuario: req.body.dataNascimento_usuario
+    }
+
     res.status(201).send({
-        mensagem: 'Usando o POST dentro da rota de Usuários'
+        mensagem: 'Usuário cadastrado com sucesso!',
+        usuario: usuario
     });
 });
 
@@ -33,19 +45,6 @@ router.get('/:id_usuario', (req, res, next) => {
     }        
 
 });
-
-router.patch('/', (req, res, next) => {
-    res.status(201).send({
-        mensagem: 'Usnado o PATCH dentro da rota de usuarios'
-
-    });
-});
-
-router.delete('/', (req, res, next) => {
-    res.status(201).send({
-        mensagem: 'Usando o DELETE dentro da rota de produtos'
-    })
-})
 
 // CADASTRO DE UM NOVO USUÁRIO
 router.post('/cadastro/:id_usuario', (req, res, next) => {
