@@ -2,13 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool
 
-// RETORNA TODOS OS USUARIOS
-router.get('/', (req, res, next) => {
-    res.status(200).send({
-        mensage: 'Usando o GET dentro da rotas de Usuários'
-    });
-});
-
 // CADASTRA UM USUARIO
 router.post('/cadastro', (req, res, next) => {
 
@@ -35,40 +28,89 @@ router.post('/cadastro', (req, res, next) => {
                 }
 
                 res.status(201).send({
-                    mensagem: 'Usuário cadastrado com sucesso!',
+                    mensagem: 'SUCESSO | Usuário cadastrado!',
                     id_usuario: resultado.insertId,
                     usuario: usuario
                 });
             }
         )
     })
-
 });
 
-// RETORNA OS DADOS DE UM USUARIO
+// RETORNA TODOS OS USUARIOS
+router.get('/', (req, res, next) => {
+
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            'SELECT * FROM usuario;',
+            (error, resultado, fields) => {
+
+                if (error) { return res.status(500).send({ error: error }) }
+
+                return res.status(200).send({ response: resultado })
+
+            }
+        )
+    })
+});
+
+// RETORNA UM USUARIO ESPECÍFICO
 router.get('/:id_usuario', (req, res, next) => {
 
     const id = req.params.id_usuario
 
-    if (id === 'especial') {
-        res.status(200).send({
-            mensagem: 'Você descobriu o ID especial!',
-            id: id
-        })
-    } else {
-        res.status(200).send({
-            mensagem: 'usando o GET de um produto',
-            id: id
-        })
-    }        
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            'SELECT * FROM usuario WHERE id_usuario = ?;',
+            [id],
+            (error, resultado, fields) => {
 
+                if (error) { return res.status(500).send({ error: error }) }
+
+                return res.status(200).send({ response: resultado })
+
+            }
+        )
+    }) 
 });
 
-// CADASTRO DE UM NOVO USUÁRIO
-router.post('/cadastro/:id_usuario', (req, res, next) => {
-    res.status(201).send({
-        mensagem: 'Usuário cadastrado com sucesso'
+// ATIVAÇÃO DO USUÁRIO
+router.patch('/ativar', (req, res, next) => {
+
+    const id = req.body.id_usuario
+
+    mysql.getConnection((error, conn) => {
+
+        conn.query( // VERIFICAR SE O USUÁRIO JÁ ESTÁ ATIVO
+            `SELECT * FROM usuario WHERE id_usuario = ?`,
+            [id],
+            (error, resultado, fields) => {
+
+                if (resultado[0].status_usuario == 1) {
+                    return res.status(409).send({
+                        response: "ERROR | Usuário já se encontra ativo"
+                    })
+                }
+                
+                conn.query( // ATIVA O USUÁRIO
+                    `UPDATE usuario
+                    SET status_usuario = ?
+                    WHERE id_usuario = ?
+                    `,
+                    [1, id],
+                    (error, resultado, fields) => {
+        
+                        if (error) { res.status(500).send({ error: error }) }
+        
+                        res.status(200).send({ response: "SUCESSO | Usuário ativo!" })
+        
+                    }
+                )                
+            }
+        )
     })
-});
+})
+
+// TODO: EXCLUSÃO DE USUÁRIO
 
 module.exports = router
