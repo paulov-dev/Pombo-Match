@@ -4,7 +4,7 @@ const mysql = require('../mysql').pool
 
 // Criar o perfil
 router.post('/', (req, res, next) => {
-    //res.status(200).send({result: "Rota ativa"})
+
     
    const perfil = {
     id_usuario: req.body.id_usuario,
