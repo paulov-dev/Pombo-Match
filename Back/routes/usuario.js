@@ -36,7 +36,7 @@ router.post('/cadastro', (req, res, next) => {
                                 })
                             }            
                             res.status(201).send({
-                                response: 'SUCESSO | Usuário cadastrado!',
+                                message: 'SUCESSO | Usuário cadastrado!',
                                 id_usuario: results.insertId,
                                 usuario: usuario
                             });
@@ -44,7 +44,7 @@ router.post('/cadastro', (req, res, next) => {
                     );
                 } else {
                     // Usuário já cadastrado, envia a resposta e interrompe a execução
-                    return res.status(409).send({ response: 'ERRO | Usuário já cadastrado!' });
+                    return res.status(409).send({ message: 'ERRO | Usuário já cadastrado!' });
                 }
             }
         );
