@@ -14,28 +14,43 @@ router.post('/cadastro', (req, res, next) => {
     }
 
     mysql.getConnection((error, conn) => {
+
         conn.query(
-            'INSERT INTO usuario (primeiroNome_usuario, ultimoNome_usuario, email_usuario, senha_usuario, status_usuario, dataNascimento_usuario) VALUES (?, ?, ?, ?, ?, ?)',
-            [usuario.primeiroNome, usuario.ultimoNome, usuario.email, usuario.senha, 0, usuario.dataNascimento],
-            (error, resultado, field) => {
-                conn.release(); // LIBERAR CONNECTION
+            `SELECT * FROM usuario WHERE email_usuario = ?`,
+            [usuario.email],
+            (error, results, field) => {
 
-                if (error) { // TRATAR ERRO
-                    return res.status(500).send({
-                        error: error,
-                        response: null
-                    })
+                console.log(results)
+                
+                if (results.length == 0) {
+                    conn.query(
+                        'INSERT INTO usuario (primeiroNome_usuario, ultimoNome_usuario, email_usuario, senha_usuario, status_usuario, dataNascimento_usuario) VALUES (?, ?, ?, ?, ?, ?)',
+                        [usuario.primeiroNome, usuario.ultimoNome, usuario.email, usuario.senha, 0, usuario.dataNascimento],
+                        (error, results, field) => {
+                            conn.release(); // LIBERAR CONNECTION
+            
+                            if (error) { // TRATAR ERRO
+                                return res.status(500).send({
+                                    error: error,
+                                    response: null
+                                })
+                            }            
+                            res.status(201).send({
+                                response: 'SUCESSO | Usuário cadastrado!',
+                                id_usuario: results.insertId,
+                                usuario: usuario
+                            });
+                        }
+                    );
+                } else {
+                    // Usuário já cadastrado, envia a resposta e interrompe a execução
+                    return res.status(409).send({ response: 'ERRO | Usuário já cadastrado!' });
                 }
-
-                res.status(201).send({
-                    mensagem: 'SUCESSO | Usuário cadastrado!',
-                    id_usuario: resultado.insertId,
-                    usuario: usuario
-                });
             }
-        )
-    })
+        );
+    });
 });
+
 
 // RETORNA TODOS OS USUARIOS
 router.get('/', (req, res, next) => {
@@ -43,11 +58,11 @@ router.get('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         conn.query(
             'SELECT * FROM usuario;',
-            (error, resultado, fields) => {
+            (error, results, fields) => {
 
                 if (error) { return res.status(500).send({ error: error }) }
 
-                return res.status(200).send({ response: resultado })
+                return res.status(200).send({ response: results })
 
             }
         )
@@ -63,11 +78,11 @@ router.get('/:id_usuario', (req, res, next) => {
         conn.query(
             'SELECT * FROM usuario WHERE id_usuario = ?;',
             [id],
-            (error, resultado, fields) => {
+            (error, results, fields) => {
 
                 if (error) { return res.status(500).send({ error: error }) }
 
-                return res.status(200).send({ response: resultado })
+                return res.status(200).send({ response: results })
 
             }
         )
@@ -84,9 +99,9 @@ router.patch('/ativar', (req, res, next) => {
         conn.query( // VERIFICAR SE O USUÁRIO JÁ ESTÁ ATIVO
             `SELECT * FROM usuario WHERE id_usuario = ?`,
             [id],
-            (error, resultado, fields) => {
+            (error, results, fields) => {
 
-                if (resultado[0].status_usuario == 1) {
+                if (results[0].status_usuario == 1) {
                     return res.status(409).send({
                         response: "ERROR | Usuário já se encontra ativo"
                     })
@@ -98,7 +113,7 @@ router.patch('/ativar', (req, res, next) => {
                     WHERE id_usuario = ?
                     `,
                     [1, id],
-                    (error, resultado, fields) => {
+                    (error, results, fields) => {
         
                         if (error) { res.status(500).send({ error: error }) }
         
