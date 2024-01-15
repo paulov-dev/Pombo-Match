@@ -2,11 +2,14 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
+const path = require('path');
+
 
 
 // CONFIGURANDO ROTAS
 const rotaUsuario = require('./routes/usuario');
 const rotaPerfil = require('./routes/perfil')
+const rotaInicial = require('./routes/index')
 
 // ATRIBUINDO ROTAS
 app.use(morgan('dev'))
@@ -31,6 +34,9 @@ app.use((req, res, next) => {
 
 app.use('/usuario', rotaUsuario);
 app.use('/perfil', rotaPerfil);
+app.use('/', rotaInicial);
+app.use(express.static(path.join(__dirname, 'src')));
+
 
 // TRATANDO ERROS
 app.use((req, res, next) => {

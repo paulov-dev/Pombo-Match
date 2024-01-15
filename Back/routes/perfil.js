@@ -3,9 +3,8 @@ const router = express.Router();
 const mysql = require('../mysql').pool
 
 // Criar o perfil
-router.post('/', (req, res, next) => {
+router.post('/inserir', (req, res, next) => {
 
-    
    const perfil = {
     id_usuario: req.body.id_usuario,
     id_curso: req.body.id_curso,

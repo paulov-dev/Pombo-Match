@@ -52,7 +52,6 @@ router.post('/cadastro', (req, res, next) => {
     });
 });
 
-
 // RETORNA TODOS OS USUARIOS
 router.get('/', (req, res, next) => {
 
