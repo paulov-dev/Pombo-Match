@@ -5,7 +5,8 @@ const bodyParser = require('body-parser')
 
 
 // CONFIGURANDO ROTAS
-const rotaUsuario = require('./routes/usuario')
+const rotaUsuario = require('./routes/usuario');
+const rotaPerfil = require('./routes/perfil')
 
 // ATRIBUINDO ROTAS
 app.use(morgan('dev'))
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/usuario', rotaUsuario);
+app.use('/perfil', rotaPerfil);
 
 // TRATANDO ERROS
 app.use((req, res, next) => {

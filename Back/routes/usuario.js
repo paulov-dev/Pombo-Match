@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool
 
+// TODO: ATUALIZAR PARA NOVO MODELO DE DB (STATUS)
+
 // CADASTRA UM USUARIO
 router.post('/cadastro', (req, res, next) => {
 
@@ -19,8 +21,6 @@ router.post('/cadastro', (req, res, next) => {
             `SELECT * FROM usuario WHERE email_usuario = ?`,
             [usuario.email],
             (error, results, field) => {
-
-                console.log(results)
                 
                 if (results.length == 0) {
                     conn.query(
@@ -58,7 +58,8 @@ router.get('/', (req, res, next) => {
         conn.query(
             'SELECT * FROM usuario;',
             (error, results, fields) => {
-
+                conn.release();
+                
                 if (error) { return res.status(500).send({ error: error }) }
 
                 return res.status(200).send({ response: results })
@@ -78,6 +79,7 @@ router.get('/:id_usuario', (req, res, next) => {
             'SELECT * FROM usuario WHERE id_usuario = ?;',
             [id],
             (error, results, fields) => {
+                conn.release();
 
                 if (error) { return res.status(500).send({ error: error }) }
 
@@ -99,6 +101,7 @@ router.patch('/ativar', (req, res, next) => {
             `SELECT * FROM usuario WHERE id_usuario = ?`,
             [id],
             (error, results, fields) => {
+                conn.release();
 
                 if (results[0].status_usuario == 1) {
                     return res.status(409).send({
@@ -113,6 +116,7 @@ router.patch('/ativar', (req, res, next) => {
                     `,
                     [1, id],
                     (error, results, fields) => {
+                        conn.release();
         
                         if (error) { res.status(500).send({ error: error }) }
         
