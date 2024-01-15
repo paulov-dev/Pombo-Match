@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool
 
-// TODO: ATUALIZAR PARA NOVO MODELO DE DB (STATUS)
+// TODO: IMPLEMENTAR SISTEMA DE LOGs
 
 // CADASTRA UM USUARIO
 router.post('/cadastro', (req, res, next) => {
@@ -24,10 +24,10 @@ router.post('/cadastro', (req, res, next) => {
                 
                 if (results.length == 0) {
                     conn.query(
-                        'INSERT INTO usuario (primeiroNome_usuario, ultimoNome_usuario, email_usuario, senha_usuario, status_usuario, dataNascimento_usuario) VALUES (?, ?, ?, ?, ?, ?)',
-                        [usuario.primeiroNome, usuario.ultimoNome, usuario.email, usuario.senha, 0, usuario.dataNascimento],
+                        'INSERT INTO usuario (primeiroNome_usuario, ultimoNome_usuario, dataNascimento_usuario, email_usuario, senha_usuario, fk_id_status) VALUES (?, ?, ?, ?, ?, ?)',
+                        [usuario.primeiroNome, usuario.ultimoNome, usuario.dataNascimento, usuario.email, usuario.senha, 1],
                         (error, results, field) => {
-                            conn.release(); // LIBERAR CONNECTION
+                            conn.release();
             
                             if (error) { // TRATAR ERRO
                                 return res.status(500).send({
@@ -42,14 +42,16 @@ router.post('/cadastro', (req, res, next) => {
                             });
                         }
                     );
-                } else {
-                    // Usuário já cadastrado, envia a resposta e interrompe a execução
+                } else {          
+
                     return res.status(409).send({ message: 'ERRO | Usuário já cadastrado!' });
+
                 }
             }
         );
     });
 });
+
 
 // RETORNA TODOS OS USUARIOS
 router.get('/', (req, res, next) => {
@@ -70,6 +72,7 @@ router.get('/', (req, res, next) => {
 });
 
 // RETORNA UM USUARIO ESPECÍFICO
+// TODO: IMPLEMENTAR SISTEMA QUE VALIDA SE O USUÁRIO EXISTE
 router.get('/:id_usuario', (req, res, next) => {
 
     const id = req.params.id_usuario
@@ -90,7 +93,7 @@ router.get('/:id_usuario', (req, res, next) => {
     }) 
 });
 
-// ATIVAÇÃO DO USUÁRIO
+// CONFIRMAÇÃO DO USUÁRIO - EMAIL
 router.patch('/ativar', (req, res, next) => {
 
     const id = req.body.id_usuario
@@ -102,19 +105,25 @@ router.patch('/ativar', (req, res, next) => {
             [id],
             (error, results, fields) => {
                 conn.release();
+                
+                if (results.length == 0){
+                    return res.status(404).send({
+                        response: "ERROR | Usuário não encontrado"
+                    }) 
+                }
 
-                if (results[0].status_usuario == 1) {
+                if (results[0].fk_id_status == 2) {
                     return res.status(409).send({
                         response: "ERROR | Usuário já se encontra ativo"
                     })
                 }
                 
-                conn.query( // ATIVA O USUÁRIO
+                conn.query( // CONFIRMA O USUÁRIO
                     `UPDATE usuario
-                    SET status_usuario = ?
+                    SET fk_id_status = ?
                     WHERE id_usuario = ?
                     `,
-                    [1, id],
+                    [2, id],
                     (error, results, fields) => {
                         conn.release();
         
