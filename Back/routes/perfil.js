@@ -33,9 +33,6 @@ router.post('/inserir', (req, res, next) => {
 
     })
 
-   
-
-
 });
 
 module.exports = router
