@@ -71,7 +71,6 @@ router.get('/', (req, res, next) => {
 });
 
 // RETORNA UM USUARIO ESPECÍFICO
-// TODO: IMPLEMENTAR SISTEMA QUE VALIDA SE O USUÁRIO EXISTE
 router.get('/:id_usuario', (req, res, next) => {
 
     const id = req.params.id_usuario
@@ -83,6 +82,8 @@ router.get('/:id_usuario', (req, res, next) => {
             (error, results, fields) => {
                 conn.release();
 
+                if (results.length == ""){ return res.status(200).send({ response: "ERROR | Usuário não encontrado" }) }
+            
                 if (error) { return res.status(500).send({ error: error }) }
 
                 return res.status(200).send({ response: results })
