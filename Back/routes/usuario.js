@@ -21,7 +21,6 @@ router.post('/cadastro', (req, res, next) => {
             `SELECT * FROM usuario WHERE email_usuario = ?`,
             [usuario.email],
             (error, results, field) => {
-                
                 if (results.length == 0) {
                     conn.query(
                         'INSERT INTO usuario (primeiroNome_usuario, ultimoNome_usuario, dataNascimento_usuario, email_usuario, senha_usuario, fk_id_status) VALUES (?, ?, ?, ?, ?, ?)',
