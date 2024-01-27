@@ -99,7 +99,7 @@ router.patch('/ativar', (req, res, next) => {
 
     mysql.getConnection((error, conn) => {
 
-        conn.query( // VERIFICAR SE O USUÁRIO JÁ ESTÁ ATIVO
+        conn.query(
             `SELECT * FROM usuario WHERE id_usuario = ?`,
             [id],
             (error, results, fields) => {
@@ -126,7 +126,7 @@ router.patch('/ativar', (req, res, next) => {
                     (error, results, fields) => {
                         conn.release();
         
-                        if (error) { res.status(500).send({ error: error }) }
+                        if (error) { return res.status(500).send({ error: error }) }
         
                         res.status(200).send({ response: "SUCESSO | Usuário ativo!" })
         
@@ -137,6 +137,41 @@ router.patch('/ativar', (req, res, next) => {
     })
 })
 
-// TODO: EXCLUSÃO DE USUÁRIO
+router.delete('/excluir/:id_usuario', (req, res, next) => {
+
+    const usuario = {
+        id_usuario: req.params.id_usuario
+    }
+
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            `SELECT * FROM usuario WHERE id_usuario = ?`,
+            [usuario.id_usuario],
+            (error, results, fields) => {
+                conn.release()
+
+                if (error) { return res.status(500).send({ error: error }) }
+
+                if (results.length == 0) { return res.status(404).send({ response: "ERROR | usuário não encontrado" }) }
+
+                if (results[0].fk_id_status == 4) { return res.status(403).send({ response: "ERROR | Usuário já se encontra desativado" }) }
+
+                conn.query(
+                    `UPDATE usuario
+                    SET fk_id_status = ?
+                    WHERE id_usuario = ?`,
+                    [4, usuario.id_usuario],
+                    (error, results, fields) => {
+
+                        if (error) { return res.status(500).send({ error: error }) }
+
+                        return res.status(200).send({ response: "SUCESSO | Usuário desativado" })
+                                                
+                    }  
+                )             
+            }
+        )  
+    })
+})
 
 module.exports = router
