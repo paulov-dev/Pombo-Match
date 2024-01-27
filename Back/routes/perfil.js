@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool
 
-//TODO: CORRIGIR VALIDAÇÃO 
+//TODO: IMPLEMENTAR COLETA DE IMG
 // ACESSAR PARA PÁGINA DE CADASTRO
 router.get('/', (req, res, next) => {
 
