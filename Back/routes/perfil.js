@@ -22,7 +22,10 @@ router.get('/', (req, res, next) => {
 
                 if (results == "") { return res.status(200).send({ response: "ERROR | Usuário não cadastrado no sistema" }) }
 
-                if (results[0].fk_id_status != 2) { return res.status(403).send({ response: "ERROR | É necessário ativar seu usuário" }) }
+                console.log(results)
+
+                if (!status_permitidos.includes(results[0].fk_id_status)) { return res.status(403).send({ response: "ERROR | Você não tem permissão para acessar" }) }
+                
                 // IMPLEMENTAR PÁGINA DE ATUALIZAÇÃO DE PERFIL
                 return res.status(200).send({ response: "OK" })
             }
@@ -53,7 +56,7 @@ router.post('/atualizar', (req, res, next) => {
 
                 if (results.length == 0) { return res.status(404).send({ response: "ERROR | Usuário não encontrado" }) }
 
-                if (!status_permitidos.includes(perfil.fk_id_status)) { return res.status(403).send({ response: 'ERROR | Você não tem permissão para' }) }
+                if (!status_permitidos.includes(results[0].fk_id_status)) { return res.status(403).send({ response: 'ERROR | Você não tem permissão para acessar' }) }
 
                 conn.query(
                     `SELECT * FROM perfil WHERE fk_id_usuario = ?`,
