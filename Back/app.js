@@ -8,7 +8,8 @@ const path = require('path');
 
 // CONFIGURANDO ROTAS
 const rotaUsuario = require('./routes/usuario');
-const rotaPerfil = require('./routes/perfil')
+const rotaPerfil = require('./routes/perfil');
+const rotaLike = require('./routes/like');
 
 // ATRIBUINDO ROTAS
 app.use(morgan('dev'))
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 
 app.use('/usuario', rotaUsuario);
 app.use('/perfil', rotaPerfil);
+app.use('/like', rotaLike);
 //app.use(express.static(path.join(__dirname, 'src')));
 
 
